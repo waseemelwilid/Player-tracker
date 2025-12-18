@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Player Habit Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      max-width: 600px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .habit {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .habit:last-child {
+      border-bottom: none;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.4);
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    .stat h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .stat p {
+      margin: 0;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      background: #22c55e;
+      color: #020617;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button:disabled {
+      background: #334155;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>⚽ Player Habit Tracker</h1>
+  <div class="subtitle">
+    Discipline first. Results follow.
+  </div>
+
+  <div class="card">
+    <div class="habit">
+      Skill Training
+      <input type="checkbox" class="habitBox">
+    </div>
+    <div class="habit">
+      Mindset Work
+      <input type="checkbox" class="habitBox">
+    </div>
+    <div class="habit">
+      Fitness / Movement
+      <input type="checkbox" class="habitBox">
+    </div>
+    <div class="habit">
+      Lifestyle Discipline
+      <input type="checkbox" class="habitBox">
+    </div>
+  </div>
+
+  <div class="card stats">
+    <div class="stat">
+      <h2 id="dailyXp">0</h2>
+      <p>Daily XP</p>
+    </div>
+    <div class="stat">
+      <h2 id="totalXp">0</h2>
+      <p>Total XP</p>
+    </div>
+    <div class="stat">
+      <h2 id="level">Foundation</h2>
+      <p>Level</p>
+    </div>
+  </div>
+
+  <button id="saveBtn" disabled>Save Today</button>
+
+  <script>
+    const boxes = document.querySelectorAll(".habitBox");
+    const dailyXpEl = document.getElementById("dailyXp");
+    const totalXpEl = document.getElementById("totalXp");
+    const levelEl = document.getElementById("level");
+    const saveBtn = document.getElementById("saveBtn");
+
+    let totalXp = Number(localStorage.getItem("totalXp")) || 0;
+    let todaySaved = localStorage.getItem("todaySaved") === new Date().toDateString();
+
+    function getLevel(xp) {
+      if (xp < 200) return "Foundation";
+      if (xp < 500) return "Consistency";
+      if (xp < 1000) return "Discipline";
+      if (xp < 2000) return "Advanced";
+      if (xp < 3500) return "Elite Habits";
+      return "1% Mindset";
+    }
+
+    function updateXP() {
+      let dailyXp = 0;
+      boxes.forEach(b => {
+        if (b.checked) dailyXp += 10;
+      });
+
+      dailyXpEl.textContent = dailyXp;
+      totalXpEl.textContent = totalXp + dailyXp;
+      levelEl.textContent = getLevel(totalXp + dailyXp);
+
+      saveBtn.disabled = dailyXp === 0 || todaySaved;
+    }
+
+    boxes.forEach(box => box.addEventListener("change", updateXP));
+
+    saveBtn.addEventListener("click", () => {
+      totalXp += Number(dailyXpEl.textContent);
+      localStorage.setItem("totalXp", totalXp);
+      localStorage.setItem("todaySaved", new Date().toDateString());
+      todaySaved = true;
+      saveBtn.disabled = true;
+      alert("XP saved. Come back tomorrow.");
+    });
+
+    totalXpEl.textContent = totalXp;
+    levelEl.textContent = getLevel(totalXp);
+    if (todaySaved) saveBtn.disabled = true;
+  </script>
+
+</body>
+</html>
